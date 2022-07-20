@@ -40,7 +40,8 @@ ctx.arc(270, 140, 8, Math.PI, 2 * Math.PI);
 ctx.arc(310, 140, 8, Math.PI, 2 * Math.PI);
 ctx.fill();
 ctx.beginPath();
-ctx.arc(290, 170, 8, 0, 2 * Math.PI);
+ctx.arc(290, 170, 8, Math.PI, 2 * Math.PI, 1);
+// ctx.arc(x, y, radius, startAngle, endAngle, counterclockwise);
 ctx.fillStyle = "red";
 ctx.fill();
 
