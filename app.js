@@ -1,164 +1,92 @@
 const canvas = document.getElementById("jsCanvas");
 const ctx = canvas.getContext("2d");
-// const colors = document.getElementsByClassName("jsColor");
-const range = document.getElementById("jsRange");
+const colors = Array.from(document.getElementsByClassName("jsColor"));
+const lineWidth = document.getElementById("jsRange");
+const color = document.getElementById("color");
 const mode = document.getElementById("jsMode");
+const eraser = document.getElementById("jsEraser");
+const deleteAll = document.getElementById("jsDelete");
 const saveBtn = document.getElementById("jsSave");
 
 const INITIAL_COLOR = "2c2c2c";
-const CANVAS_SIZE = 700;
+const CANVAS_SIZE = 800;
 
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
+ctx.lineWidth = lineWidth.value;
+let isPainting = false;
+let isFilling = false;
+function onMove(event) {
+  if (isPainting) {
+    ctx.lineTo(event.offsetX, event.offsetY);
+    ctx.stroke();
+    return;
+  }
 
-// House 🏠
-// ctx.fillStyle = "brown";
-// ctx.fillRect(200 + 200, 200, 50, 200);
-// ctx.fillRect(400 + 200, 200, 50, 200);
-// ctx.lineWidth = 2;
-// ctx.fillRect(300 + 200, 300, 50, 100);
-// ctx.fillRect(200 + 200, 200, 200, 20);
-// ctx.fillStyle = "pink";
-// ctx.moveTo(200 + 200, 200);
-// ctx.lineTo(325 + 200, 100);
-// ctx.lineTo(450 + 200, 200);
-// ctx.fill();
-
-// Person 🧍🏾
-// ctx.beginPath();
-// ctx.fillStyle = "black";
-// ctx.fillRect(210, 200, 15, 100);
-// ctx.fillRect(350, 200, 15, 100);
-// ctx.fillRect(260, 200, 60, 200);
-// ctx.arc(290, 150, 50, 0, 2 * Math.PI);
-
-// ctx.fill();
-
-// ctx.beginPath();
-// ctx.fillStyle = "yellow";
-// ctx.arc(270, 140, 8, Math.PI, 2 * Math.PI);
-// ctx.arc(310, 140, 8, Math.PI, 2 * Math.PI);
-// ctx.fill();
-// ctx.beginPath();
-// ctx.arc(290, 170, 8, Math.PI, 2 * Math.PI, 1);
-// // ctx.arc(x, y, radius, startAngle, endAngle, counterclockwise);
-// ctx.fillStyle = "red";
-// ctx.fill();
-
-ctx.fillStyle = "white";
-ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-ctx.strokeStyle = INITIAL_COLOR;
-ctx.fillStyle = INITIAL_COLOR;
-ctx.lineWidth = 2.5;
-
-const colors = ["#7A2F49", "#FBABC7", "#FA5F95", "#7A002A", "#C74C77"];
-
-const colors2 = ["#2F7A34", "#ABFBB0", "#5FFA69", "#197A1F", "#4CC754"];
-
-function onMousemove(event) {
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  const color = colors[Math.floor(Math.random() * colors.length)];
-  ctx.strokeStyle = color;
-  ctx.lineTo(event.offsetX, event.offsetY);
-  ctx.stroke();
+  ctx.moveTo(event.offsetX, event.offsetY);
 }
 
-function onClick(event) {
-  console.log(event);
-  ctx.beginPath();
-  ctx.moveTo(800, 800);
-  const color2 = colors2[Math.floor(Math.random() * colors2.length)];
-  ctx.strokeStyle = color2;
-  ctx.lineTo(event.offsetX, event.offsetY);
-  ctx.stroke();
+function startPainting() {
+  isPainting = true;
 }
 
-canvas.addEventListener("mousemove", onMousemove);
-canvas.addEventListener("mousemove", onClick);
+function cancelPainting() {
+  isPainting = false;
+  ctx.beginPath();
+}
+function onLineWidthChange(event) {
+  ctx.lineWidth = event.target.value;
+}
 
-// let painting = false;
-// let filling = false;
+function onColorChange(event) {
+  ctx.strokeStyle = event.target.value;
+  ctx.fillStyle = event.target.value;
+}
 
-// function stopPainting() {
-//   painting = false;
-// }
+function onColorClick(event) {
+  const colorValue = event.target.dataset.color;
+  ctx.strokeStyle = colorValue;
+  ctx.fillStyle = colorValue;
+  color.value = colorValue;
+}
 
-// function startPainting() {
-//   painting = true;
-// }
+function onModeClick() {
+  if (isFilling) {
+    isFilling = false;
+    mode.innerText = "FIll";
+  } else {
+    isFilling = true;
+    mode.innerText = "Draw";
+  }
+}
 
-// function onMouseMove(event) {
-//   const x = event.offsetX;
-//   const y = event.offsetY;
-//   if (!painting) {
-//     ctx.beginPath();
-//     ctx.moveTo(x, y);
-//   } else {
-//     ctx.lineTo(x, y);
-//     ctx.stroke();
-//   }
-// }
+function onCanvasClick() {
+  if (isFilling) {
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  }
+}
 
-// function handleColorClick(event) {
-//   const color = event.target.style.backgroundColor;
-//   ctx.strokeStyle = color;
-//   ctx.fillStyle = color;
-// }
+function onEraserClick() {
+  ctx.strokeStyle = "white";
+  isFilling = false;
+  mode.innerText = "FIll";
+}
 
-// function handleRangeChange(event) {
-//   const size = event.target.value;
-//   ctx.lineWidth = size;
-// }
+function onDeleteAllClick() {
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+}
 
-// function handleModeClick() {
-//   if (filling === true) {
-//     filling = false;
-//     mode.innerText = "Fill";
-//   } else {
-//     filling = true;
-//     mode.innerText = "Paint";
-//   }
-// }
+canvas.addEventListener("mousemove", onMove);
+canvas.addEventListener("mousedown", startPainting);
+canvas.addEventListener("mouseup", cancelPainting);
+canvas.addEventListener("mouseleave", cancelPainting);
+canvas.addEventListener("click", onCanvasClick);
+lineWidth.addEventListener("change", onLineWidthChange);
+color.addEventListener("change", onColorChange);
 
-// function handleCanvasClick() {
-//   if (filling) {
-//     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-//   }
-// }
+colors.forEach((color) => color.addEventListener("click", onColorClick));
 
-// function handleCM(event) {
-//   event.preventDefault();
-// }
-
-// function handleSaveClick() {
-//   const image = canvas.toDataURL();
-//   const link = document.createElement("a");
-//   link.href = image;
-//   link.download = "PaintJS[🎨]";
-//   link.click();
-// }
-
-// if (canvas) {
-//   canvas.addEventListener("mousemove", onMouseMove);
-//   canvas.addEventListener("mousedown", startPainting);
-//   canvas.addEventListener("mouseup", stopPainting);
-//   canvas.addEventListener("mouseleave", stopPainting);
-//   canvas.addEventListener("click", handleCanvasClick);
-//   canvas.addEventListener("contextmenu", handleCM);
-// }
-// Array.from(colors).forEach((color) =>
-//   color.addEventListener("click", handleColorClick)
-// );
-
-// if (range) {
-//   range.addEventListener("input", handleRangeChange);
-// }
-
-// if (mode) {
-//   mode.addEventListener("click", handleModeClick);
-// }
-
-// if (saveBtn) {
-//   saveBtn.addEventListener("click", handleSaveClick);
-// }
+mode.addEventListener("click", onModeClick);
+eraser.addEventListener("click", onEraserClick);
+deleteAll.addEventListener("click", onDeleteAllClick);
